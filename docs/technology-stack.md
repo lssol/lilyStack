@@ -70,9 +70,12 @@ When building an automated nursery, choosing the correct wireless protocol is cr
 | **Best Use in Nursery**| Temp/Humidity, Buttons, Contacts | Future-proof smart plugs | High-bandwidth Video only | Beacons & Proximity |
 
 ### Why Zigbee & Thread Win for Nursery Sensors
-1. **Sleep States**: Zigbee sensors remain in ultra-low-power sleep states until an environmental threshold is crossed (e.g. temperature change $\ge 0.2^\circ\text{C}$), drawing only microamperes.
-2. **Mesh Redundancy**: Mains-powered Zigbee devices (such as smart plugs and light bulbs) act as *Routers*, extending mesh signal coverage through walls without adding load to your home Wi-Fi router.
-3. **Coexistence**: By setting Zigbee to **Channel 25** and home Wi-Fi to Channels 1 and 6, packet collisions and interference are mathematically eliminated.
+1. **Sleep States**: Zigbee & Thread sensors remain in ultra-low-power sleep states until an environmental threshold is crossed (e.g. temperature change $\ge 0.2^\circ\text{C}$), drawing only microamperes.
+2. **Mesh Redundancy**: Mains-powered Zigbee & Thread devices (such as smart plugs and light bulbs) act as *Routers / Repeaters*, extending mesh signal coverage through walls without adding load to your home Wi-Fi router.
+3. **Coexistence with IKEA's Ecosystem (Zigbee + Matter over Thread)**:
+   * **IKEA Sensors & Plugs (PARASOLL, VALLHORN, SOMRIG, VINDSTYRKA, INSPELNING)**: Use **Zigbee 3.0**.
+   * **IKEA New Generation Bulbs (KAJPLATS)**: Use **Matter over Thread** (with an unadvertised fallback Zigbee mode).
+   * **The Universal Hardware Key**: The **SMLIGHT SLZB-06M** uses the Silicon Labs **EFR32MG21** chip, natively supporting **both Zigbee 3.0 and OpenThread Border Router (Matter over Thread)** for Home Assistant!
 
 ---
 

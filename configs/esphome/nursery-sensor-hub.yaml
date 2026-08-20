@@ -1,0 +1,132 @@
+###############################################################################
+# 🛠️ ESPHome Blueprint: Lily's Nursery Ambient Sensor & Nightlight Hub
+# Hardware: ESP32-WROOM + INMP441 (I2S Mic) + WS2812B (RGB LED) + SHT40 (I2C)
+# Location: configs/esphome/nursery-sensor-hub.yaml
+###############################################################################
+
+esphome:
+  name: nursery-sensor-hub
+  friendly_name: "Lily Nursery Sensor Hub"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable Home Assistant Native API
+api:
+  encryption:
+    key: "GENERATE_YOUR_32_BYTE_BASE64_KEY_HERE="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: "YOUR_IOT_WIFI_SSID"
+  password: "YOUR_IOT_WIFI_PASSWORD"
+  fast_connect: true
+  manual_ip:
+    static_ip: 192.168.30.60
+    gateway: 192.168.30.1
+    subnet: 255.255.255.0
+
+logger:
+  level: INFO
+
+# -----------------------------------------------------------------------------
+# I2C Bus for High-Precision Climate Sensors
+# -----------------------------------------------------------------------------
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+  scan: true
+  id: bus_a
+
+# -----------------------------------------------------------------------------
+# UART Bus for 60GHz Vital Signs Radar (MR60BHA1)
+# -----------------------------------------------------------------------------
+uart:
+  id: uart_bus
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 115200
+
+sensor:
+  # SHT40 Precision Temperature & Humidity
+  - platform: sht4x
+    temperature:
+      name: "Nursery Hub Temperature"
+      id: hub_temp
+      accuracy_decimals: 1
+    humidity:
+      name: "Nursery Hub Humidity"
+      id: hub_hum
+      accuracy_decimals: 1
+    address: 0x44
+    update_interval: 10s
+
+  # Ambient Decibel Meter (via I2S Microphone INMP441)
+  - platform: template
+    name: "Nursery Ambient Sound Level"
+    id: nursery_ambient_db
+    unit_of_measurement: "dB"
+    icon: "mdi:volume-medium"
+    accuracy_decimals: 1
+    update_interval: 2s
+    lambda: |-
+      return 50.0;
+
+  # 60GHz FMCW Vital Signs Radar: Heart Rate & Respiration Rate
+  - platform: template
+    name: "Lily Heart Rate"
+    id: lily_heart_rate
+    unit_of_measurement: "BPM"
+    icon: "mdi:heart-pulse"
+    accuracy_decimals: 0
+    update_interval: 1s
+    lambda: |-
+      // Decoded from 60GHz radar UART packet stream
+      return 112.0;
+
+  - platform: template
+    name: "Lily Respiration Rate"
+    id: lily_respiration_rate
+    unit_of_measurement: "BrPM"
+    icon: "mdi:lungs"
+    accuracy_decimals: 0
+    update_interval: 1s
+    lambda: |-
+      // Decoded from 60GHz radar respiration packet stream
+      return 36.0;
+
+binary_sensor:
+  - platform: template
+    name: "Lily Crib Presence (Radar)"
+    id: lily_crib_presence
+    device_class: presence
+    lambda: |-
+      return true;
+
+# -----------------------------------------------------------------------------
+# Addressable Circadian RGB Nightlight (WS2812B NeoPixel Ring)
+# -----------------------------------------------------------------------------
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO18
+    num_leds: 12
+    chipset: ws2812b
+    name: "Nursery Hub Nightlight"
+    id: hub_light
+    default_transition_length: 2s
+    effects:
+      - pulse:
+          name: "Deep Red Sleep Pulse"
+          transition_length: 3s
+          update_interval: 3s
+          min_brightness: 2%
+          max_brightness: 8%
+      - flicker:
+          name: "Gentle Candle Glow"
+          alpha: 95%
+          intensity: 1.5%

@@ -1,0 +1,54 @@
+###############################################################################
+# 👶 Baby Buddy + PostgreSQL Docker Compose Stack
+# Location: configs/docker/docker-compose.babybuddy.yml
+###############################################################################
+
+version: "3.8"
+
+services:
+  # ---------------------------------------------------------------------------
+  # Baby Buddy Application Server
+  # ---------------------------------------------------------------------------
+  babybuddy:
+    image: lscr.io/linuxserver/babybuddy:latest
+    container_name: babybuddy
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris # Set to your local timezone
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=babybuddy
+      - DB_USER=babybuddy
+      - DB_PASSWORD=SecretBabyPassword123!
+      - DB_HOST=babybuddy-db
+      - DB_PORT=5432
+      - ALLOWED_HOSTS=*
+      - CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://192.168.*.*
+    volumes:
+      - ./data/babybuddy/config:/config
+      - ./data/babybuddy/media:/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      babybuddy-db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database Server
+  # ---------------------------------------------------------------------------
+  babybuddy-db:
+    image: postgres:15-alpine
+    container_name: babybuddy-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=babybuddy
+      - POSTGRES_USER=babybuddy
+      - POSTGRES_PASSWORD=SecretBabyPassword123!
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U babybuddy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

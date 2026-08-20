@@ -1,0 +1,204 @@
+###############################################################################
+# 🍼 BabyStack Home Assistant Automations for Lily's Smart Nursery
+# Location: configs/home-assistant/automations.yaml
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# 1. 3:00 AM Gentle Night Feeding Scene (Deep Red 650nm Light)
+# -----------------------------------------------------------------------------
+- id: 'nursery_night_feeding_scene_start'
+  alias: "Nursery: Start Night Feeding Scene"
+  description: "Ramps floor lamp to deep red at 6% brightness for night feedings"
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        command: "single"
+        device_ieee: "00:12:4b:00:1a:2b:3c:4d" # Replace with your Glider Zigbee Button IEEE
+    - platform: tag
+      tag_id: "lily_feeding_nfc_tag"
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.nursery_floor_lamp
+      data:
+        transition: 3
+        brightness_pct: 6
+        rgb_color: [255, 0, 0] # Deep Red (Melatonin Safe)
+    - service: notify.notify
+      data:
+        message: "Feeding mode activated for Lily."
+
+- id: 'nursery_night_feeding_scene_end'
+  alias: "Nursery: End Night Feeding / All Off"
+  description: "Fades nursery light to off when long-pressing glider switch"
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        command: "hold"
+        device_ieee: "00:12:4b:00:1a:2b:3c:4d"
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.nursery_floor_lamp
+      data:
+        transition: 5
+
+# -----------------------------------------------------------------------------
+# 2. Diaper Change Light Boost (Warm Amber)
+# -----------------------------------------------------------------------------
+- id: 'nursery_diaper_change_light_boost'
+  alias: "Nursery: Diaper Change Light Boost"
+  description: "Shifts light to warm amber 20% for diaper changes"
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        command: "double"
+        device_ieee: "00:12:4b:00:1a:2b:3c:4d"
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.nursery_floor_lamp
+      data:
+        transition: 2
+        brightness_pct: 20
+        color_temp_kelvin: 2200 # Warm Amber
+
+# -----------------------------------------------------------------------------
+# 3. Safe Sleep Climate & Thermal Guard
+# -----------------------------------------------------------------------------
+- id: 'nursery_temperature_safe_guard'
+  alias: "Nursery: Safe Sleep Temperature Alert"
+  description: "Sends critical alert if nursery temperature exceeds safe boundaries"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.nursery_temperature
+      above: 21.0
+      for:
+        minutes: 5
+    - platform: numeric_state
+      entity_id: sensor.nursery_temperature
+      below: 17.5
+      for:
+        minutes: 5
+  condition:
+    - condition: state
+      entity_id: binary_sensor.nursery_crib_presence
+      state: 'on' # Only alert if Lily is in the crib
+  action:
+    - service: notify.persistent_notification
+      data:
+        title: "⚠️ Nursery Temperature Alert"
+        message: "Nursery temperature is currently {{ states('sensor.nursery_temperature') }}°C. Safe range is 18°C - 20°C."
+    - service: notify.all_parents_phones
+      data:
+        title: "⚠️ Lily Nursery Temperature Alert!"
+        message: "Room is {{ states('sensor.nursery_temperature') }}°C (Outside safe 18-20°C range)."
+        data:
+          push:
+            sound:
+              name: "critical_alert.caf"
+              critical: 1
+              volume: 1.0
+
+# -----------------------------------------------------------------------------
+# 4. Nursery Door Ajar Warning During Nap Window
+# -----------------------------------------------------------------------------
+- id: 'nursery_door_ajar_warning'
+  alias: "Nursery: Door Left Ajar During Nap"
+  description: "Alerts parents if nursery door is left slightly open during nap time"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.nursery_door_contact
+      to: 'on'
+      for:
+        minutes: 3
+  condition:
+    - condition: state
+      entity_id: binary_sensor.nursery_crib_presence
+      state: 'on'
+  action:
+    - service: notify.all_parents_phones
+      data:
+        title: "🚪 Nursery Door Open"
+        message: "Lily is sleeping in crib, but the nursery door has been open for 3 minutes."
+
+# -----------------------------------------------------------------------------
+# 5. 1-Tap NFC Tag Diaper Change Logger (Baby Buddy)
+# -----------------------------------------------------------------------------
+- id: 'nursery_nfc_diaper_logger'
+  alias: "Nursery: NFC Diaper Change Logger"
+  description: "Logs diaper change into Baby Buddy when phone taps changing table tag"
+  trigger:
+    - platform: tag
+      tag_id: "lily_changing_table_nfc"
+  action:
+    - service: baby_buddy.add_diaper_change
+      data:
+        wet: true
+        solid: false
+        time: "{{ now().isoformat() }}"
+    - service: notify.mobile_app_parents_phone
+      data:
+        message: "✅ Diaper change recorded in Baby Buddy!"
+
+# -----------------------------------------------------------------------------
+# 6. Sonos: Local Brown Noise Loop & Safe Volume Cap
+# -----------------------------------------------------------------------------
+- id: 'nursery_sonos_brown_noise_toggle'
+  alias: "Nursery: Sonos Continuous Brown Noise"
+  description: "Plays offline local brown noise file on Sonos capped at safe 50 dB level"
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        command: "button_2_single" # Secondary button on glider remote
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: media_player.nursery_sonos
+              state: 'playing'
+          sequence:
+            - service: media_player.media_pause
+              target:
+                entity_id: media_player.nursery_sonos
+      default:
+        # Set volume to safe pediatric level (~25% volume = ~55 dB at 2m)
+        - service: media_player.volume_set
+          target:
+            entity_id: media_player.nursery_sonos
+          data:
+            volume_level: 0.25
+        # Play local seamless continuous brown noise loop (zero internet needed)
+        - service: media_player.play_media
+          target:
+            entity_id: media_player.nursery_sonos
+          data:
+            media_content_id: "media-source://media_source/local/audio/deep_brown_noise_loop.mp3"
+            media_content_type: "music"
+
+# -----------------------------------------------------------------------------
+# 7. Sonos: Spotify Lullaby / Feeding Playlist
+# -----------------------------------------------------------------------------
+- id: 'nursery_sonos_spotify_lullaby'
+  alias: "Nursery: Play Spotify Lullabies on Sonos"
+  description: "Streams gentle acoustic lullabies from Spotify during evening wind-down"
+  trigger:
+    - platform: tag
+      tag_id: "lily_lullaby_nfc_tag"
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.nursery_sonos
+      data:
+        volume_level: 0.20
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.nursery_sonos
+      data:
+        media_content_id: "spotify:playlist:37i9dQZF1DX11ghcNxW4aa" # Spotify Baby Lullaby Peaceful Piano
+        media_content_type: "playlist"
+

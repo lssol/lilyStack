@@ -1,0 +1,300 @@
+###############################################################################
+# 🌸 Lily's Nursery Dashboard (Home Assistant Lovelace UI)
+# Location: configs/home-assistant/dashboards/nursery-dashboard.yaml
+# Uses: Mushroom Cards + WebRTC Camera Card (HACS)
+###############################################################################
+
+title: "Lily's Nursery"
+views:
+  - title: "Nursery Monitor"
+    path: "nursery"
+    icon: "mdi:baby-carriage"
+    type: "sidebar"
+    cards:
+      # =======================================================================
+      # MAIN COLUMN: Video Stream & Quick Controls
+      # =======================================================================
+      - type: vertical-stack
+        cards:
+          # 1. Header & Live Status Chips
+          - type: custom:mushroom-title-card
+            title: "🌸 Lily's Nursery"
+            subtitle: "Live Telemetry & Care Hub"
+
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: sensor.lily_heart_rate
+                icon: "mdi:heart-pulse"
+                content_info: state
+              - type: entity
+                entity: sensor.lily_respiration_rate
+                icon: "mdi:lungs"
+                content_info: state
+              - type: entity
+                entity: sensor.nursery_temperature
+                icon: "mdi:thermometer"
+              - type: entity
+                entity: sensor.nursery_humidity
+                icon: "mdi:water-percent"
+              - type: entity
+                entity: binary_sensor.nursery_crib_presence
+                icon: "mdi:baby-bed"
+                content_info: state
+              - type: entity
+                entity: sensor.nursery_air_quality_pm25
+                icon: "mdi:air-filter"
+
+          # 2. Ultra-Low Latency Video Stream (go2rtc WebRTC)
+          - type: custom:webrtc-camera
+            url: "lily_crib"
+            poster: "https://via.placeholder.com/640x360.png?text=Lily+Crib+Stream"
+            ui: true
+            muted: false
+
+          # 3. Fast Care Actions (1-Tap Baby Buddy Deck)
+          - type: custom:mushroom-title-card
+            title: "🍼 1-Tap Activity Logging"
+
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: "Left Feed"
+                secondary: "Breast"
+                icon: "mdi:mother-nurse"
+                icon_color: "pink"
+                tap_action:
+                  action: call-service
+                  service: baby_buddy.add_feeding
+                  service_data:
+                    type: "breast milk"
+                    method: "left"
+
+              - type: custom:mushroom-template-card
+                primary: "Right Feed"
+                secondary: "Breast"
+                icon: "mdi:mother-nurse"
+                icon_color: "pink"
+                tap_action:
+                  action: call-service
+                  service: baby_buddy.add_feeding
+                  service_data:
+                    type: "breast milk"
+                    method: "right"
+
+              - type: custom:mushroom-template-card
+                primary: "Tummy Time"
+                secondary: "Start / Stop"
+                icon: "mdi:baby-face"
+                icon_color: "amber"
+                tap_action:
+                  action: call-service
+                  service: baby_buddy.add_tummy_time
+                  service_data:
+                    start: "{{ now().isoformat() }}"
+
+              - type: custom:mushroom-template-card
+                primary: "Diaper Wet"
+                secondary: "Pee"
+                icon: "mdi:water"
+                icon_color: "blue"
+                tap_action:
+                  action: call-service
+                  service: baby_buddy.add_diaper_change
+                  service_data:
+                    wet: true
+                    solid: false
+
+              - type: custom:mushroom-template-card
+                primary: "Diaper Dirty"
+                secondary: "Poo / Both"
+                icon: "mdi:emoticon-poop"
+                icon_color: "brown"
+                tap_action:
+                  action: call-service
+                  service: baby_buddy.add_diaper_change
+                  service_data:
+                    wet: true
+                    solid: true
+
+              - type: custom:mushroom-template-card
+                primary: "Bottle Feed"
+                secondary: "Formula/Milk"
+                icon: "mdi:baby-bottle"
+                icon_color: "purple"
+                tap_action:
+                  action: call-service
+                  service: baby_buddy.add_feeding
+                  service_data:
+                    type: "formula"
+                    amount: 90
+
+      # =======================================================================
+      # SIDEBAR COLUMN: Climate, Lighting & Timers
+      # =======================================================================
+      - type: vertical-stack
+        cards:
+          # 1. Contactless Vitals (60GHz Radar)
+          - type: custom:mushroom-title-card
+            title: "🫀 Live Vitals (60GHz Radar)"
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: gauge
+                entity: sensor.lily_heart_rate
+                name: "Heart Rate"
+                unit: "BPM"
+                min: 60
+                max: 180
+                needle: true
+                severity:
+                  green: 95
+                  yellow: 140
+                  red: 165
+
+              - type: gauge
+                entity: sensor.lily_respiration_rate
+                name: "Breathing"
+                unit: "BrPM"
+                min: 15
+                max: 70
+                needle: true
+                severity:
+                  green: 25
+                  yellow: 50
+                  red: 60
+
+          # 2. Environment Gauges
+          - type: custom:mushroom-title-card
+            title: "🌡️ Climate Safe-Zone"
+
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: gauge
+                entity: sensor.nursery_temperature
+                name: "Temperature"
+                unit: "°C"
+                min: 15
+                max: 25
+                needle: true
+                severity:
+                  green: 18
+                  yellow: 20.5
+                  red: 22
+
+              - type: gauge
+                entity: sensor.nursery_humidity
+                name: "Humidity"
+                unit: "%"
+                min: 20
+                max: 80
+                needle: true
+                severity:
+                  green: 40
+                  yellow: 60
+                  red: 70
+
+              - type: gauge
+                entity: sensor.nursery_ambient_sound_level
+                name: "Sound Level"
+                unit: "dB"
+                min: 30
+                max: 90
+                needle: true
+                severity:
+                  green: 45
+                  yellow: 65
+                  red: 75
+
+          # 2. Lighting & Night Scene Controls
+          - type: custom:mushroom-title-card
+            title: "💡 Nursery Environment"
+
+          - type: custom:mushroom-light-card
+            entity: light.nursery_floor_lamp
+            name: "Nightlight"
+            show_brightness_control: true
+            show_color_control: true
+            use_light_color: true
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: "3 AM Red Mode"
+                secondary: "6% Brightness"
+                icon: "mdi:weather-night"
+                icon_color: "red"
+                tap_action:
+                  action: call-service
+                  service: light.turn_on
+                  service_data:
+                    entity_id: light.nursery_floor_lamp
+                    rgb_color: [255, 0, 0]
+                    brightness_pct: 6
+
+          # 3. Audio & Smart Speaker (Sonos / Brown Noise)
+          - type: custom:mushroom-title-card
+            title: "🔊 Nursery Audio & Sound"
+
+          - type: custom:mushroom-media-player-card
+            entity: media_player.nursery_sonos
+            name: "Sonos Nursery"
+            icon: "mdi:speaker"
+            use_media_artwork: true
+            show_volume_level: true
+            volume_controls:
+              - volume_buttons
+              - volume_set
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: "Brown Noise"
+                secondary: "Continuous Loop"
+                icon: "mdi:wave"
+                icon_color: "amber"
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.nursery_sonos_continuous_brown_noise
+
+              - type: custom:mushroom-template-card
+                primary: "Spotify Lullabies"
+                secondary: "Peaceful Piano"
+                icon: "mdi:music"
+                icon_color: "green"
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.nursery_play_spotify_lullabies_on_sonos
+
+          # 4. Care History (Baby Buddy Status Summary)
+          - type: custom:mushroom-title-card
+            title: "📋 Recent Activity"
+
+          - type: entities
+            entities:
+              - entity: sensor.lily_last_feeding
+                name: "Last Feeding"
+                icon: "mdi:baby-bottle-outline"
+              - entity: sensor.lily_last_diaper_change
+                name: "Last Diaper"
+                icon: "mdi:baby"
+              - entity: sensor.lily_last_sleep
+                name: "Last Nap / Sleep"
+                icon: "mdi:sleep"
+              - entity: sensor.lily_feeding_side_suggested
+                name: "Suggested Next Side"
+                icon: "mdi:arrow-decision-auto"

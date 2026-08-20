@@ -30,7 +30,8 @@ IKEA is currently the industry leader in affordable, beautifully designed, and s
 | Motion / Light    | IKEA VALLHORN              | Zigbee PIR (2xAAA)    | $9.99        |
 | Glider Controller | IKEA SOMRIG Shortcut Button| Zigbee 2-Btn (6 acts) | $9.99        |
 | Wall Dimmer       | IKEA RODRET Wireless Switch| Zigbee Rocker Dimmer  | $7.99        |
-| Smart Lighting    | IKEA TRÅDFRI E26/E27 RGB   | Zigbee 806lm Color    | $12.99       |
+| Shelf Moon Lamp   | **IKEA FADO (Opal Glass)** | 17cm/25cm Frosted Ball| $14.99       |
+| Smart Lighting    | IKEA TRÅDFRI/KAJPLATS RGBW | Matter/Zigbee Color    | $12.99       |
 | Smart Plug (Power)| IKEA INSPELNING            | Zigbee Power Meter    | $9.99        |
 | Smart Plug (Basic)| IKEA TRETAKT               | Zigbee On/Off         | $7.99        |
 | Rechargeables     | IKEA LADDA AAA (4-pack) x2 | 750mAh NiMH (Japan)   | $13.98 (2x)  |
@@ -38,7 +39,7 @@ IKEA is currently the industry leader in affordable, beautifully designed, and s
 | Cable Safety      | IKEA MONTERA / SIGNUM      | Cable Trunking Trunk  | $9.99        |
 | Babyproofing      | IKEA PATRULL Corner/Plugs  | Child Safety Kit      | $6.99        |
 +-------------------+----------------------------+-----------------------+--------------+
-|                   |                            | IKEA SUB-TOTAL        | ~$286.00     |
+|                   |                            | IKEA SUB-TOTAL        | ~$301.00     |
 +-------------------+----------------------------+-----------------------+--------------+
 ```
 

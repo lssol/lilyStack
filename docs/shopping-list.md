@@ -56,10 +56,12 @@ IKEA does not manufacture compute servers, security cameras, or 60GHz vital-sign
 | **60GHz Vital Signs Radar** | **Contactless Heartbeat & Breathing Sensor** (ESPHome/Wi-Fi) | **Seeed Studio MR60BHA1 60GHz Radar** (or pre-assembled ESPHome kit) | $39 – $49 |
 | **Local RTSP Camera** | 100% private local baby video feed (WAN isolated) | **Reolink E1 Pro (2K/4K)** OR **TP-Link Tapo C225** | $45 – $55 |
 | **Dedicated Offline Baby Monitor** | **Non-negotiable fail-safe** (5" HD screen, 30h battery, 0 lag) | **HelloBaby HB6550 / HB6550 Pro** | **$79** |
+| **Decorative Jute Rope Fairy Lights** | 2m warm-white 40-LED boho rope | **Action Corde de Jute LED (Réf 2576933)** | **~3 €** |
+| **Zigbee 3.0 USB Dimmer** | DC PWM dimmer for fairy lights (0–100% fade) | **Gledopto GL-C-009P / Tuya USB Dimmer** | **~12 €** |
 | **NFC Stickers (Optional)**| 1-tap logging under changing table mat & glider | **NTAG215 Matte Tags (Pack of 10)** | $8 |
 
 > [!TIP]
-> **French / European Sourcing Tip**: For the **SMLIGHT SLZB-MR2U Dual-Radio Coordinator** and all smart accessories, **[Domadoo.fr](https://www.domadoo.fr)** is the premier French home automation retailer. They offer 24–48h Colissimo shipping in France and a 2-year statutory warranty.
+> **French / European Sourcing Tip**: For the **SMLIGHT SLZB-MR2U Dual-Radio Coordinator**, **Gledopto Zigbee dimmers**, and smart accessories, **[Domadoo.fr](https://www.domadoo.fr)** is the premier French home automation retailer. They offer 24–48h Colissimo shipping in France and a 2-year statutory warranty.
 
 ---
 

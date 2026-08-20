@@ -57,7 +57,7 @@ IKEA does not manufacture compute servers, security cameras, or 60GHz vital-sign
 | **Local RTSP Camera** | 100% private local baby video feed (WAN isolated) | **Reolink E1 Pro (2K/4K)** OR **TP-Link Tapo C225** | $45 – $55 |
 | **Dedicated Offline Baby Monitor** | **Non-negotiable fail-safe** (5" HD screen, 30h battery, 0 lag) | **HelloBaby HB6550 / HB6550 Pro** | **$79** |
 | **Decorative Jute Rope Fairy Lights** | 2m warm-white 40-LED boho rope | **Action Corde de Jute LED (Réf 2576933)** | **~3 €** |
-| **Zigbee 3.0 USB Dimmer** | DC PWM dimmer for fairy lights (0–100% fade) | **Gledopto GL-C-009P / Tuya USB Dimmer** | **~12 €** |
+| **Zigbee 3.0 LED Dimmer** | DC PWM dimmer (5V–24V) for fairy lights (0–100% fade) | **[Gledopto GL-C-009P Ultra-Thin](https://www.domadoo.fr/fr/produits-de-domotique/9700-gledopto-gl-c-009p-controleur-led-zigbee-pro-ultra-thin-1-couleur.html)** *(Domadoo)* | **~12 €** |
 | **NFC Stickers (Optional)**| 1-tap logging under changing table mat & glider | **NTAG215 Matte Tags (Pack of 10)** | $8 |
 
 > [!TIP]

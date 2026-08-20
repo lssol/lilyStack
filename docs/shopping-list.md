@@ -51,14 +51,14 @@ IKEA does not manufacture compute servers, security cameras, or 60GHz vital-sign
 | Device | Purpose | Brand / Model | Approx. Price |
 | :--- | :--- | :--- | :--- |
 | **Home Assistant Hub** | Central offline automation brain | **Home Assistant Green** OR **Intel N100 Mini PC** | $99 – $140 |
-| **Zigbee 3.0 Network Coordinator** | Ethernet/PoE Network Zigbee Coordinator (Zero RF interference) | **SMLIGHT SLZB-06 / SLZB-06M** *(Available on Domadoo.fr)* | ~35 € |
+| **Zigbee & Thread Dual-Radio Coordinator** | **Dual-Chip Ethernet/PoE** (CC2652P for Zigbee + EFR32MG21 for Thread/Matter) | **SMLIGHT SLZB-MR2U** *(Domadoo.fr)* | **~44 €** |
 | **60GHz Vital Signs Radar** | **Contactless Heartbeat & Breathing Sensor** (ESPHome/Wi-Fi) | **Seeed Studio MR60BHA1 60GHz Radar** (or pre-assembled ESPHome kit) | $39 – $49 |
 | **Local RTSP Camera** | 100% private local baby video feed (WAN isolated) | **Reolink E1 Pro (2K/4K)** OR **TP-Link Tapo C225** | $45 – $55 |
 | **Dedicated Offline Baby Monitor** | **Non-negotiable fail-safe** (5" HD screen, 30h battery, 0 lag) | **HelloBaby HB6550 / HB6550 Pro** | **$79** |
 | **NFC Stickers (Optional)**| 1-tap logging under changing table mat & glider | **NTAG215 Matte Tags (Pack of 10)** | $8 |
 
 > [!TIP]
-> **French / European Sourcing Tip**: For all Zigbee accessories, SMLIGHT coordinators, and Home Assistant hardware, **[Domadoo.fr](https://www.domadoo.fr)** is the premier French home automation retailer. They offer 24–48h Colissimo shipping in France, 2-year statutory warranty, and competitive pricing often matching or beating Amazon.
+> **French / European Sourcing Tip**: For the **SMLIGHT SLZB-MR2U Dual-Radio Coordinator** and all smart accessories, **[Domadoo.fr](https://www.domadoo.fr)** is the premier French home automation retailer. They offer 24–48h Colissimo shipping in France and a 2-year statutory warranty.
 
 ---
 

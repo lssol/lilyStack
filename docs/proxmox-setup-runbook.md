@@ -145,6 +145,28 @@ systemctl enable xrdp && systemctl restart xrdp
 
 ---
 
+### Step 1.4: Install Tailscale on `devbox` (Access from Anywhere in the World 🌍)
+
+To RDP into `devbox` from Starbucks, hotel Wi-Fi, or cellular data **without opening router ports**:
+
+1. **Inside `devbox` shell** (`pct enter 101`):
+   ```bash
+   curl -fsSL https://tailscale.com/install.sh | sh
+   tailscale up --hostname=babystack-devbox
+   ```
+2. Click the authentication link printed in terminal to pair with your Tailscale account.
+3. **Connect from Anywhere**:
+   * On your Mac or Windows laptop, install the **Tailscale app** and log into the same account.
+   * In Remote Desktop (`mstsc` / Mac Windows App), connect to **`babystack-devbox`** (or its `100.x.y.z` Tailscale IP).
+   * **Result**: Direct, encrypted WireGuard remote desktop from anywhere in the world!
+
+> [!TIP]
+> **Granular App Access Policy**:
+> * By installing Tailscale **only inside `devbox` and Home Assistant**, only those two specific services are accessible remotely.
+> * Your Proxmox host GUI (`:8006`), Samba NAS (`:445`), and local network remain completely isolated and invisible from the outside.
+
+---
+
 # 🛡️ STAGE 2: 4TB Storage & Gluetun Media Stack (Priority #2)
 
 ### Step 2.1: Mount 4TB External USB HDD (In Proxmox Host Shell)

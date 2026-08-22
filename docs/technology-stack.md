@@ -75,7 +75,7 @@ When building an automated nursery, choosing the correct wireless protocol is cr
 3. **Coexistence with IKEA's Ecosystem (Zigbee + Matter over Thread)**:
    * **IKEA Sensors & Plugs (PARASOLL, VALLHORN, SOMRIG, VINDSTYRKA, INSPELNING)**: Use **Zigbee 3.0**.
    * **IKEA New Generation Bulbs (KAJPLATS)**: Use **Matter over Thread** (with an unadvertised fallback Zigbee mode).
-   * **The Universal Hardware Key**: The **SMLIGHT SLZB-06M** uses the Silicon Labs **EFR32MG21** chip, natively supporting **both Zigbee 3.0 and OpenThread Border Router (Matter over Thread)** for Home Assistant!
+   * **The Dual-Silicon Hardware Key**: The **[SMLIGHT SLZB-MR2U](file:///c:/Users/sacha/src/babystack/docs/hardware/smlight-slzb-mr2u-guide.md)** integrates **two independent hardware SoCs** (TI CC2652P for Zigbee 3.0 + Silicon Labs EFR32MG21 for Thread/Matter) over Ethernet PoE, delivering simultaneous, zero-compromise operation for Home Assistant!
 
 ---
 

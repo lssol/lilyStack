@@ -36,19 +36,20 @@ graph TD
         CRIB["🛏️ Lily's Crib (IKEA SNIGLAR / GULLIVER)"]
         CAM["📹 Local RTSP Camera (VLAN Isolated)"]
         VITALS["🫀 60GHz Vital Signs Radar (Heart Rate + Breathing)"]
-        CLIM["🌡️ IKEA VINDSTYRKA (Air Quality + Climate)"]
-        CONTACTS["🚪 IKEA PARASOLL (Door & Window Contacts)"]
-        LIGHT["💡 IKEA TRÅDFRI RGBW (Circadian Red/Warm)"]
-        SOUND["🔊 IKEA SYMFONISK (Sonos Continuous Brown Noise)"]
-        PLUGS["🔌 IKEA INSPELNING (Power Metering Smart Plug)"]
+        CLIM["🌡️ IKEA ALPSTUGA (CO2 + PM2.5 + Climate + Clock)"]
+        CONTACTS["🚪 IKEA MYGGBETT (Door & Window Contacts)"]
+        MOTION["🚶 IKEA MYGGSPRAY (PIR Motion Sensor)"]
+        LIGHT["💡 IKEA KAJPLATS RGBW (Circadian Red/Warm Bulb)"]
+        SOUND["🔊 IKEA SYMFONISK (Sonos Continuous Brown Noise - Owned ✅)"]
+        PLUGS["🔌 IKEA GRILLPLATS (Smart Plug)"]
         NFC["🏷️ NFC Stickers (Glider & Changing Table)"]
-        BTN["🔘 IKEA SOMRIG / RODRET (Glider & Wall Controller)"]
+        BTN["🔘 IKEA BILRESA (Glider Shortcut Remote)"]
         AUDIO_FAILSAFE["📻 HelloBaby HB6550 Dedicated Monitor (5in Screen / 30h)"]
     end
 
     subgraph "Local Smart Home Core"
-        HA["🏠 Home Assistant (OS / Mini PC / Green)"]
-        ZIGBEE["📶 Zigbee 3.0 Coordinator (SkyConnect / Sonoff)"]
+        HA["🏠 Home Assistant (CHUWI UBox: Ryzen 5 6600H / 16GB DDR5)"]
+        ZIGBEE["📶 Zigbee & Thread Dual Coordinator (SMLIGHT SLZB-MR2U)"]
         GO2RTC["⚡ go2rtc (Ultra-low Latency WebRTC Video)"]
         BB["👶 Baby Buddy (Activity & Health Tracker)"]
         ESPHOME["🛠️ ESPHome (60GHz Vital Signs + Sound Hub)"]
@@ -61,11 +62,12 @@ graph TD
     end
 
     %% Connections
-    CLIM -->|Zigbee| ZIGBEE
-    CONTACTS -->|Zigbee| ZIGBEE
-    LIGHT -->|Zigbee| ZIGBEE
-    BTN -->|Zigbee| ZIGBEE
-    PLUGS -->|Zigbee| ZIGBEE
+    CLIM -->|Matter / Thread| ZIGBEE
+    CONTACTS -->|Matter / Thread| ZIGBEE
+    MOTION -->|Matter / Thread| ZIGBEE
+    LIGHT -->|Matter / Thread| ZIGBEE
+    BTN -->|Matter / Thread| ZIGBEE
+    PLUGS -->|Matter / Thread| ZIGBEE
     ZIGBEE --> HA
 
     CAM -->|Local RTSP / PoE| GO2RTC
@@ -91,13 +93,17 @@ graph TD
 
 | Document / Directory | Description |
 | :--- | :--- |
-| **[`docs/shopping-list.md`](file:///c:/Users/sacha/src/babystack/docs/shopping-list.md)** | Curated hardware recommendations, tiered budgets (Starter, Balanced, Pro), specs, and purchase links. |
+| **[`docs/shopping-list.md`](file:///c:/Users/sacha/src/babystack/docs/shopping-list.md)** | Curated hardware recommendations, tiered budgets, specs, and purchase links. |
+| **[`docs/proxmox-setup-runbook.md`](file:///c:/Users/sacha/src/babystack/docs/proxmox-setup-runbook.md)** | ⭐ **Turnkey 1-click Proxmox VE 8 runbook**: LXC/VM separation, Community Helper-Scripts, 4TB mount, GPU passthrough. |
+| **[`docs/hardware/chuwi-ubox-guide.md`](file:///c:/Users/sacha/src/babystack/docs/hardware/chuwi-ubox-guide.md)** | Full teardown, BIOS unlock (`Alt+F5`), port standards, and Linux/Proxmox tweaks for the CHUWI UBox. |
+| **[`docs/hardware/smlight-slzb-mr2u-guide.md`](file:///c:/Users/sacha/src/babystack/docs/hardware/smlight-slzb-mr2u-guide.md)** | Dual-radio Zigbee & Thread architecture, PoE setup, RF frequency planning, and SLZB-OS runbook. |
+| **[`docs/homelab-services.md`](file:///c:/Users/sacha/src/babystack/docs/homelab-services.md)** | Multi-service homelab architecture: OpenCode dev server, 4TB USB NAS, Gluetun VPN + ARR stack, and Jellyfin VA-API. |
 | **[`docs/installation-guide.md`](file:///c:/Users/sacha/src/babystack/docs/installation-guide.md)** | Step-by-step physical room babyproofing, camera angles, network VLAN isolation, and Home Assistant setup. |
 | **[`docs/technology-stack.md`](file:///c:/Users/sacha/src/babystack/docs/technology-stack.md)** | Deep-dive into local-first tech (Zigbee/Thread vs Wi-Fi, go2rtc, Baby Buddy architecture, threat models). |
 | **[`docs/automations-and-ideas.md`](file:///c:/Users/sacha/src/babystack/docs/automations-and-ideas.md)** | 3:00 AM gentle routines, climate guards, NFC workflows, plus future toddler expansions (OK-to-wake, story cards). |
 | **[`configs/home-assistant/`](file:///c:/Users/sacha/src/babystack/configs/home-assistant/)** | Ready-to-use Home Assistant automations (`automations.yaml`) and Lovelace dashboards (`nursery-dashboard.yaml`). |
 | **[`configs/esphome/`](file:///c:/Users/sacha/src/babystack/configs/esphome/)** | Custom ESP32 sensor hub blueprint (ambient sound dB meter + circadian nightlight). |
-| **[`configs/docker/`](file:///c:/Users/sacha/src/babystack/configs/docker/)** | Docker Compose deployment for standalone Baby Buddy + PostgreSQL setups. |
+| **[`configs/docker/`](file:///c:/Users/sacha/src/babystack/configs/docker/)** | Docker Compose deployment for Baby Buddy + PostgreSQL and full Homelab media/dev/NAS stack. |
 
 ---
 

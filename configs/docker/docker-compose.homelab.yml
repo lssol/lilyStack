@@ -1,0 +1,199 @@
+version: "3.8"
+
+# =============================================================================
+# 🚀 BabyStack Homelab: Multi-Service Docker Compose Stack
+# Host: CHUWI UBox (AMD Ryzen 5 6600H / 16GB DDR5 / 512GB NVMe + 4TB USB HDD)
+# Services:
+#   - OpenCode / Code-Server (Dev Environment)
+#   - Samba NAS (/mnt/storage4tb)
+#   - Gluetun VPN + qBittorrent (Kill-Switch Protected)
+#   - Radarr, Sonarr, Bazarr, Prowlarr (Media Automation)
+#   - Jellyfin (AMD Radeon 660M VA-API GPU Hardware Acceleration)
+# =============================================================================
+
+networks:
+  homelab-net:
+    driver: bridge
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. DEVELOPMENT: OpenCode / Code-Server
+  # ---------------------------------------------------------------------------
+  opencode-dev:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: opencode-dev
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - PASSWORD=YourSecureDevPassword123 # Change this!
+      - SUDO_PASSWORD=YourSecureDevPassword123
+    volumes:
+      - /opt/homelab/opencode/config:/config
+      - /home/sacha/src:/workspace
+    ports:
+      - "8443:8443"
+    networks:
+      - homelab-net
+
+  # ---------------------------------------------------------------------------
+  # 2. NETWORK STORAGE: Samba NAS for 4TB USB HDD
+  # ---------------------------------------------------------------------------
+  samba-nas:
+    image: dperson/samba:latest
+    container_name: samba-nas
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - USERID=1000
+      - GROUPID=1000
+    volumes:
+      - /mnt/storage4tb/data/nas-shares:/shares/storage
+      - /mnt/storage4tb/data/media:/shares/media
+    ports:
+      - "139:139"
+      - "445:445"
+    command: >
+      -u "nasuser;SecureNasPassword123"
+      -s "Storage;/shares/storage;yes;no;no;nasuser;nasuser"
+      -s "Media;/shares/media;yes;no;no;nasuser;nasuser"
+    networks:
+      - homelab-net
+
+  # ---------------------------------------------------------------------------
+  # 3. VPN GATEWAY: Gluetun (WireGuard / OpenVPN)
+  # ---------------------------------------------------------------------------
+  gluetun-vpn:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun-vpn
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=custom # e.g. protonvpn, mullvad, nordvpn, airvpn
+      - VPN_TYPE=wireguard
+      # Provide your Wireguard or OpenVPN credentials here:
+      - WIREGUARD_PRIVATE_KEY=YOUR_WIREGUARD_PRIVATE_KEY
+      - WIREGUARD_ADDRESSES=10.2.0.2/32
+    ports:
+      - "8080:8080" # qBittorrent Web UI (forwarded through Gluetun)
+      - "6881:6881" # Torrent Peer Port
+      - "6881:6881/udp"
+    networks:
+      - homelab-net
+
+  # ---------------------------------------------------------------------------
+  # 4. DOWNLOAD CLIENT: qBittorrent (Locked inside Gluetun VPN)
+  # ---------------------------------------------------------------------------
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    network_mode: "service:gluetun-vpn" # Direct routing through VPN container
+    depends_on:
+      - gluetun-vpn
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - WEBUI_PORT=8080
+    volumes:
+      - /opt/homelab/qbittorrent/config:/config
+      - /mnt/storage4tb/data/torrents:/data/torrents
+      - /mnt/storage4tb/data/media:/data/media
+
+  # ---------------------------------------------------------------------------
+  # 5. AUTOMATION: Prowlarr Indexer Manager
+  # ---------------------------------------------------------------------------
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /opt/homelab/prowlarr/config:/config
+    ports:
+      - "9696:9696"
+    networks:
+      - homelab-net
+
+  # ---------------------------------------------------------------------------
+  # 6. AUTOMATION: Radarr (Movies) & Sonarr (TV Shows)
+  # ---------------------------------------------------------------------------
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /opt/homelab/radarr/config:/config
+      - /mnt/storage4tb/data:/data
+    ports:
+      - "7878:7878"
+    networks:
+      - homelab-net
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /opt/homelab/sonarr/config:/config
+      - /mnt/storage4tb/data:/data
+    ports:
+      - "8989:8989"
+    networks:
+      - homelab-net
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /opt/homelab/bazarr/config:/config
+      - /mnt/storage4tb/data/media:/data/media
+    ports:
+      - "6767:6767"
+    networks:
+      - homelab-net
+
+  # ---------------------------------------------------------------------------
+  # 7. MEDIA STREAMING: Jellyfin with AMD Radeon 660M VA-API GPU Passthrough
+  # ---------------------------------------------------------------------------
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - JELLYFIN_PublishedServerUrl=http://192.168.10.10:8096
+    volumes:
+      - /opt/homelab/jellyfin/config:/config
+      - /mnt/storage4tb/data/media:/data/media
+    ports:
+      - "8096:8096"
+    devices:
+      # AMD Radeon 660M Hardware Transcoding Engine (VA-API / RDNA2)
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+    networks:
+      - homelab-net

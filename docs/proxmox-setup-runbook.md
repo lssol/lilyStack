@@ -60,14 +60,29 @@ graph TD
 ### 2. Proxmox VE 8 OS Installation (5 minutes)
 1. Boot installer, select internal **512GB NVMe SSD**, set timezone (`Europe/Paris`), password, and static IP (e.g. `192.168.1.100`).
 2. Log into Web GUI: **`https://192.168.1.100:8006`**.
-3. Open **`pve` Shell** and run the community post-install script:
-   ```bash
-   bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/misc/post-pve-install.sh)"
-   ```
-4. Enable **ZRAM** (Compressed RAM swap for heavy compilation):
-   ```bash
-   apt update && apt install -y zram-tools && echo "PERCENT=50" >> /etc/default/zramswap && systemctl restart zramswap
-   ```
+### 3. Enable ZRAM & Tailscale Subnet Router (Global Remote Access 🌍)
+In the Proxmox host shell:
+
+```bash
+# 1. Enable ZRAM (Compressed RAM swap for heavy OpenCode builds)
+apt update && apt install -y zram-tools && echo "PERCENT=50" >> /etc/default/zramswap && systemctl restart zramswap
+
+# 2. Install Tailscale on the Proxmox Host
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# 3. Enable IP Forwarding (Allows Tailscale to route to all containers & VMs)
+echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
+echo 'net.ipv6.conf.all.forwarding = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
+sysctl -p /etc/sysctl.d/99-tailscale.conf
+
+# 4. Start Tailscale advertising your entire local network subnet
+tailscale up --advertise-routes=192.168.1.0/24 --hostname=babystack-pve
+```
+
+* **1-Click Route Approval**:
+  1. Open [login.tailscale.com/admin/machines](https://login.tailscale.com/admin/machines) on your phone/laptop.
+  2. Find **`babystack-pve`** → Click **`...`** → **Edit route settings** → Check **`192.168.1.0/24`** → Save.
+* **Result**: You now have seamless, encrypted access to **everything** (`devbox` RDP, Home Assistant, Proxmox GUI `:8006`, Jellyfin, Samba NAS) using their exact local IPs from anywhere in the world without opening a single router port!
 
 ---
 
@@ -143,27 +158,11 @@ systemctl enable xrdp && systemctl restart xrdp
 2. Computer: `192.168.1.101`.
 3. Log in with `devuser` and password.
 
----
-
-### Step 1.4: Install Tailscale on `devbox` (Access from Anywhere in the World 🌍)
-
-To RDP into `devbox` from Starbucks, hotel Wi-Fi, or cellular data **without opening router ports**:
-
-1. **Inside `devbox` shell** (`pct enter 101`):
-   ```bash
-   curl -fsSL https://tailscale.com/install.sh | sh
-   tailscale up --hostname=babystack-devbox
-   ```
-2. Click the authentication link printed in terminal to pair with your Tailscale account.
-3. **Connect from Anywhere**:
-   * On your Mac or Windows laptop, install the **Tailscale app** and log into the same account.
-   * In Remote Desktop (`mstsc` / Mac Windows App), connect to **`babystack-devbox`** (or its `100.x.y.z` Tailscale IP).
-   * **Result**: Direct, encrypted WireGuard remote desktop from anywhere in the world!
-
-> [!TIP]
-> **Granular App Access Policy**:
-> * By installing Tailscale **only inside `devbox` and Home Assistant**, only those two specific services are accessible remotely.
-> * Your Proxmox host GUI (`:8006`), Samba NAS (`:445`), and local network remain completely isolated and invisible from the outside.
+#### 🌍 Accessing `devbox` RDP from Anywhere (via Tailscale):
+Because your Proxmox host is configured as a **Tailscale Subnet Router** (from Pre-Flight Step 3):
+1. Simply turn on the **Tailscale app** on your Mac, Windows laptop, or iPhone while away from home.
+2. Open Remote Desktop (`mstsc` / macOS Windows App) and connect to **`192.168.1.101`** exactly as if you were sitting on your living room couch!
+3. All local IPs (`192.168.1.xxx`) work transparently everywhere without any port forwarding.
 
 ---
 
